@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 常用颜色 -->
+    <color name="ipalmap_alpha_black">#88000000</color>
+    <color name="ipalmap_show_book_shelf_bg">#F2F2F2</color>
+    <color name="line_gray">#F2F2F2</color>
+    <color name="half_transparent">#b0000000</color>
+    <color name="primary_deep_blue">#2C3245</color>
+    <color name="primary_blue">#23C4B7</color>
+    <color name="line">#F2F2F2</color>
+    <color name="black_deep">#202E2E</color>
+    <color name="gray_light">#B7C0BC</color>
+    <color name="dark_grey">#5D5959</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="gray">#33AAAAAA</color>
+    <color name="red">#FFFF0000</color>
+    <color name="yellow">#FFCF53</color>
+    <color name="bg_after_text">#A2CE62</color>
+    <color name="scan_red">#EE3E53</color>
+    <color name="pink">#FA6E9F</color>
+    <color name="transparent">#00000000</color>
+
+    <color name="list_item_text_color_pressed">#FEFFFF</color>
+    <color name="list_item_text_color">#666666</color>
+    <color name="list_item_divider">#D6D6D5</color>
+
+    <!--actionBar-->
+    <color name="action_bar_title_color_default">#FFFFFF</color>
+    <color name="action_bar_little_title_color_default">#FFFFFF</color>
+    <color name="action_bar_bg_color">#EE3E53</color>
+    <color name="action_bar_title_color">#FFFFFF</color>
+
+    <!-- 地图模块 -->
+    <color name="floor_list_item_bg">#9FFFFFFF</color>
+    <color name="floor_list_pressed_bg">#9FDEDEDE</color>
+    <color name="floor_list_name_color">#5EC6EB</color>
+    <color name="primary">#019285</color>
+    <color name="light_primary">#DBF0f8</color>
+    <color name="renderable_color">#FFFF5722</color>
+
+</resources>

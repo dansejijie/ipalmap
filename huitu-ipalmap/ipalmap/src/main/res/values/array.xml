@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="function">
+        <item>地图显示</item>
+        <item>地图事件</item>
+        <item>覆盖物</item>
+        <item>搜索POI</item>
+        <item>定位</item>
+        <item>路径规划</item>
+        <item>坐标转化</item>
+        <item>样式配置</item>
+    </string-array>
+
+    <string-array name="function_array">
+        <item>@array/map_display</item>
+        <item>@array/map_event</item>
+        <item>@array/cover</item>
+        <item>@array/search_poi</item>
+        <item>@array/locate</item>
+        <item>@array/route_plan</item>
+        <item>@array/coordinate_transform</item>
+        <item>@array/style_configuration</item>
+    </string-array>
+
+    <string-array name="map_display">
+        <item>单栋建筑物</item>
+        <item>多栋建筑物</item>
+        <item>设置初始视图区域</item>
+
+    </string-array>
+
+    <string-array name="map_event">
+        <item>点击事件</item>
+        <item>手势操作</item>
+
+    </string-array>
+
+    <string-array name="cover">
+        <item>Marker</item>
+        <item>在地图上绘制点线面</item>
+
+    </string-array>
+
+    <string-array name="search_poi">
+        <item>输入关键字查找POI</item>
+
+    </string-array>
+
+    <string-array name="locate">
+        <item>WIFI定位</item>
+        <item>蓝牙定位</item>
+
+    </string-array>
+
+    <string-array name="route_plan">
+        <item>路径规划</item>
+        <item>途经点导航</item>
+
+    </string-array>
+
+    <string-array name="coordinate_transform">
+        <item>转化</item>
+
+    </string-array>
+
+    <string-array name="style_configuration">
+        <item>动态替换style</item>
+
+    </string-array>
+
+
+</resources>
