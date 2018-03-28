@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/ipalmap_show_book_shelf_bg"
+        android:gravity="center_horizontal"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:weightSum="1">
+        <test.dansejijie.com.ipalmap.view.BookShelf
+            android:id="@+id/ipalmap_show_bookshelf"
+            android:layout_width="300dp"
+            android:layout_height="190dp"
+            android:layout_marginTop="30dp"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/gray"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"/>
+        <TextView
+            android:text="@string/iplmap_book_shelf_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:textSize="14sp"
+            android:textColor="@color/black_deep"/>
+        <Button
+            android:id="@+id/ipalmap_btn_show_bookshelf"
+            android:layout_width="63dp"
+            android:layout_height="33dp"
+            android:text="@string/iplmap_book_shelf_button"
+            android:textSize="13sp"
+            android:textColor="@color/primary_blue"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="25dp"
+            android:padding="0dp"
+            android:background="@drawable/ipalmap_show_book_shelf_button"/>
+    </LinearLayout>
+    <ImageButton
+        android:id="@+id/ipalmap_ib_show_help_close"
+        android:layout_marginTop="76dp"
+        android:layout_marginBottom="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ipalmap_show_close"/>
+
+</LinearLayout>
