@@ -17,14 +17,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name="com.backustech.ipalmap.activity.IpalmapNavigationActivity"
-            android:theme="@style/IpalmapHeaderBar" android:screenOrientation="portrait">
-        </activity>
-        <activity android:name="com.backustech.ipalmap.activity.IpalmapShowMapActivity"
+        <activity android:name="com.backustech.ipalmap.activity.IpalmapActivity"
             android:theme="@style/IpalmapHeaderBar" android:screenOrientation="portrait">
         </activity>
 
+        <service android:name="com.palmaplus.nagrand.position.ble.BeaconService"/>
 
     </application>
 

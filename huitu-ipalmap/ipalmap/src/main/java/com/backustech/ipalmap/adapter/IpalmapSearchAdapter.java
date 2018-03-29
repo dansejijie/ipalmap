@@ -21,15 +21,14 @@ public class IpalmapSearchAdapter extends BaseAdapter {
     private Context mContent;
     private LocationPagingList mData;
 
-    public IpalmapSearchAdapter(Context context, LocationPagingList data){
-        mContent=context;
-        mData=data;
+    public IpalmapSearchAdapter(Context context, LocationPagingList data) {
+        mContent = context;
+        mData = data;
     }
 
-    public void setData(LocationPagingList data){
-        mData=data;
+    public void setData(LocationPagingList data) {
+        mData = data;
     }
-
 
     @Override
     public int getCount() {
@@ -50,16 +49,16 @@ public class IpalmapSearchAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         ViewHolder viewHolder;
-        if(convertView==null){
-            viewHolder=new ViewHolder();
-            convertView= LayoutInflater.from(mContent).inflate(R.layout.ipalmap_search_list_item,null);
-            viewHolder.tvTitle= (TextView) convertView.findViewById(R.id.ipalmap_nav_tv_list_item_name);
+        if (convertView == null) {
+            viewHolder = new ViewHolder();
+            convertView = LayoutInflater.from(mContent).inflate(R.layout.ipalmap_search_list_item, null);
+            viewHolder.tvTitle = (TextView) convertView.findViewById(R.id.ipalmap_nav_tv_list_item_name);
             convertView.setTag(viewHolder);
-        }else {
-            viewHolder= (ViewHolder) convertView.getTag();
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        LocationModel locationModel=mData.getPOI(position);
+        LocationModel locationModel = mData.getPOI(position);
         viewHolder.tvTitle.setText(LocationModel.display.get(locationModel));
         return convertView;
     }

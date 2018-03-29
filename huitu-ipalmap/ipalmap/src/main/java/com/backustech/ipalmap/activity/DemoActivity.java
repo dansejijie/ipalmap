@@ -1,6 +1,5 @@
 package com.backustech.ipalmap.activity;
 
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
@@ -29,37 +28,25 @@ public class DemoActivity extends Activity {
      */
     private static final int REQUEST_WRITE_STORAGE = 112;
 
-    private boolean hasPermission=false;
+    private boolean hasPermission = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Button btnShow= (Button) findViewById(R.id.btn_show);
-        Button btnNavigation= (Button) findViewById(R.id.btn_navigation);
-        Button btnTest=(Button) findViewById(R.id.btn_test);
-
+        Button btnShow = (Button) findViewById(R.id.btn_show);
         btnShow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if(!hasPermission){
-                    Toast.makeText(DemoActivity.this,"需要文件操作权限",Toast.LENGTH_SHORT);
+                if (!hasPermission) {
+                    Toast.makeText(DemoActivity.this, "需要文件操作权限", Toast.LENGTH_SHORT);
                     return;
                 }
 
-                Intent intent=new Intent(DemoActivity.this,IpalmapShowMapActivity.class);
-                intent.putExtra("call_number","K109/426/2015");
-                intent.putExtra("book_name","书目名字");
-                startActivity(intent);
-            }
-        });
-
-        btnNavigation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(DemoActivity.this,IpalmapNavigationActivity.class);
+                Intent intent = new Intent(DemoActivity.this, IpalmapActivity.class);
+                intent.putExtra("call_number", "K109/426/2015");
+                intent.putExtra("book_name", "书目名字");
                 startActivity(intent);
             }
         });
@@ -79,7 +66,6 @@ public class DemoActivity extends Activity {
 
         }
     }
-
 
 
     @Override
@@ -104,7 +90,6 @@ public class DemoActivity extends Activity {
                 break;
         }
     }
-
 
 
     /**

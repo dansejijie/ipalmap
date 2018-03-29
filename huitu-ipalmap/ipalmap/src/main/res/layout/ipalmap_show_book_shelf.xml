@@ -12,7 +12,7 @@
         android:paddingLeft="12dp"
         android:paddingRight="12dp"
         android:weightSum="1">
-        <test.dansejijie.com.ipalmap.view.BookShelf
+        <com.backustech.ipalmap.view.BookShelf
             android:id="@+id/ipalmap_show_bookshelf"
             android:layout_width="300dp"
             android:layout_height="190dp"

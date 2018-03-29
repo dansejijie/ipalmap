@@ -5,9 +5,8 @@
     android:padding="20dp"
     android:gravity="center_horizontal"
     android:id="@+id/ipalmap_ll_father">
-    <Button
-        android:id="@+id/ipalmap_button"
-        android:text="弹框"
+    <com.palmaplus.nagrand.view.MapView
+        android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </LinearLayout>

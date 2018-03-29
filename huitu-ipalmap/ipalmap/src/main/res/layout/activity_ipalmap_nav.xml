@@ -226,16 +226,32 @@
         android:orientation="vertical"
         android:visibility="gone"
         >
-        <TextView
-            android:id="@+id/ipalmap_nav_tv_naving"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="22sp"
-            android:textColor="@color/white"
-            tools:text="前方1米处向右转弯"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            >
+
+            <ImageButton
+                android:id="@+id/ipalmap_naving_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/icon_nav_left"/>
+
+            <TextView
+                android:id="@+id/ipalmap_nav_tv_naving"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:textColor="@color/white"
+                android:maxLines="2"
+                tools:text="前方1米处向右转弯"
+                android:layout_marginLeft="12dp"/>
+        </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
