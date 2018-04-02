@@ -93,13 +93,8 @@ public class IpalmapActivity extends AppCompatActivity implements View.OnClickLi
             } else {
                 showShowHeaderBarMap();
                 showFragment = new ShowMapFragemnt();
+                showFragment.setArguments(mData);
                 FragmentUtils.replaceFragment(getSupportFragmentManager(), showFragment, R.id.ipalmap_fragment_container, false);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        showFragment.setData(mData);
-                    }
-                });
             }
         } else if (id == R.id.ipalmap_header_bar_nav) {
             if (!bookLoaded) {

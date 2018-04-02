@@ -2,6 +2,9 @@ package com.backustech.ipalmap.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -22,13 +25,13 @@ import com.palmaplus.nagrand.core.Engine;
 
 public class DemoActivity extends Activity {
 
-
     /**
      * 申请读写文件权限返回标志字段
      */
     private static final int REQUEST_WRITE_STORAGE = 112;
 
     private boolean hasPermission = false;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,20 +41,16 @@ public class DemoActivity extends Activity {
         btnShow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if (!hasPermission) {
                     Toast.makeText(DemoActivity.this, "需要文件操作权限", Toast.LENGTH_SHORT);
                     return;
                 }
-
                 Intent intent = new Intent(DemoActivity.this, IpalmapActivity.class);
                 intent.putExtra("call_number", "K109/426/2015");
                 intent.putExtra("book_name", "书目名字");
                 startActivity(intent);
             }
         });
-
-
         //是否拥有读写文件的权限,Android6.0及以上需开发者格外注意权限问题.
         hasPermission = (ContextCompat.checkSelfPermission(DemoActivity.this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -63,10 +62,8 @@ public class DemoActivity extends Activity {
             return;
         } else {
             copyLuaToStorage();
-
         }
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -90,7 +87,6 @@ public class DemoActivity extends Activity {
                 break;
         }
     }
-
 
     /**
      * 把Asset目录下的lua配置文件复制到sd卡内

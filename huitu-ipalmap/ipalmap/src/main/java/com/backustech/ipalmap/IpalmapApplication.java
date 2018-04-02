@@ -16,9 +16,6 @@ public class IpalmapApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-//        CrashReport.initCrashReport(this, "c53b8df309", false);
-
-        // copy assets Nagrand/lua to SD Card Nagrand/lua folder
         FileUtilsTools.copyDirToSDCardFromAsserts(this, "Nagrand/lua", "font");
         FileUtilsTools.copyDirToSDCardFromAsserts(this, "Nagrand/lua", "Nagrand/lua");
 

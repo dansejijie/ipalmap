@@ -32,6 +32,8 @@ public abstract class BaseMapFragment extends BaseFragment {
         super.onInitFragment(savedInstanceState);
         // 获取MapView
         mapView = (MapView) view.findViewById(R.id.ipalmap_map);
+
+
         map = mapView.getMap();
         // 通过MapView获取Map对象，并且根据MapID渲染地图
         map.startWithMapID(Constant.SINGLE_BUILDING_ID);

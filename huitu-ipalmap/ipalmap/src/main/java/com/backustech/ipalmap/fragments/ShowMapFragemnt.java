@@ -3,6 +3,7 @@ package com.backustech.ipalmap.fragments;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,6 +27,12 @@ import com.backustech.ipalmap.R;
 import com.backustech.ipalmap.utils.Constant;
 import com.backustech.ipalmap.view.BookShelf;
 import com.backustech.ipalmap.view.IpalmapHelpIndicatorView;
+import com.palmaplus.nagrand.core.Types;
+import com.palmaplus.nagrand.data.Feature;
+import com.palmaplus.nagrand.data.LocationModel;
+import com.palmaplus.nagrand.data.PlanarGraph;
+import com.palmaplus.nagrand.geos.Coordinate;
+import com.palmaplus.nagrand.view.MapView;
 
 import org.json.JSONObject;
 
@@ -85,6 +92,8 @@ public class ShowMapFragemnt extends BaseMapFragment implements View.OnClickList
 
     Handler mHandler;
 
+
+
     @Override
     protected View getView(LayoutInflater inflater, ViewGroup container) {
         return inflater.inflate(R.layout.activity_ipalmap_show, container, false);
@@ -115,23 +124,40 @@ public class ShowMapFragemnt extends BaseMapFragment implements View.OnClickList
 
         ImageButton ib_ReportDialog = (ImageButton) view.findViewById(R.id.ipalmap_ib_error);
         ib_ReportDialog.setOnClickListener(this);
+
+
+
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mHandler = new Handler(this);
+
+        map.addOnChangePlanarGraph(new MapView.OnChangePlanarGraph() {
+            @Override
+            public void onChangePlanarGraph(PlanarGraph planarGraph, PlanarGraph planarGraph1, long l, long l1) {
+                if(bookLoaded){
+                    //选中书架标亮
+                    Types.Point point=mapView.converToScreenCoordinate(map_x_value,map_y_value);
+                    Feature feature= mapView.selectFeature((float) point.x,(float) point.y);
+                    if(feature!=null){
+                        long featureId = LocationModel.id.get(feature);
+                        mapView.setRenderableColor("Area",featureId, Color.BLUE);
+                    }
+                }
+            }
+        });
+
+        Bundle data=getArguments();
+        //setData会有两种情况，一种是fragment加载好了，等待网络加载data,一种是data好了，等待加载fragment
+        setData(data);
     }
 
 
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
-            case 1://后台请求到信息
-                initTextView();
-                //隔3s后消失左下角的提示块
-                mHandler.sendEmptyMessageDelayed(MESSAGE_DISMSS_TIP, 3000);
-                break;
             case MESSAGE_DISMSS_TIP:
                 ll_bubbleError.setVisibility(View.GONE);
                 break;
@@ -169,18 +195,23 @@ public class ShowMapFragemnt extends BaseMapFragment implements View.OnClickList
     }
 
     public void setData(Bundle bundle) {
-        address = bundle.getString("address");
-        bookshelfGuide = bundle.getString("bookshelfGuide");
-        bookNumber = bundle.getString("bookNumber");
-        bookId = bundle.getString("bookId");
-        bookTitle = bundle.getString("bookTitle");
-        bookShelfRows = bundle.getInt("bookShelfRows");
-        bookShelfColumns = bundle.getInt("bookShelfColumns");
-        bookRow = bundle.getInt("bookRow");
-        bookColumn = bundle.getInt("bookColumn");
-        map_x_value = bundle.getDouble("map_x_value");
-        map_y_value = bundle.getDouble("map_y_value");
-        initTextView();
+
+        try{
+            address = bundle.getString("address");
+            bookshelfGuide = bundle.getString("bookshelfGuide");
+            bookNumber = bundle.getString("bookNumber");
+            bookId = bundle.getString("bookId");
+            bookTitle = bundle.getString("bookTitle");
+            bookShelfRows = bundle.getInt("bookShelfRows");
+            bookShelfColumns = bundle.getInt("bookShelfColumns");
+            bookRow = bundle.getInt("bookRow");
+            bookColumn = bundle.getInt("bookColumn");
+            map_x_value = bundle.getDouble("map_x_value");
+            map_y_value = bundle.getDouble("map_y_value");
+            initTextView();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 
@@ -243,10 +274,22 @@ public class ShowMapFragemnt extends BaseMapFragment implements View.OnClickList
     }
 
     private void initTextView() {
+        bookLoaded=true;
         tv_address.setText(address);
         tv_book_title.setText(bookTitle);
         tv_book_number.setText(bookNumber);
         tv_bookshelf_guide.setText(bookshelfGuide);
+
+        mHandler.sendEmptyMessageDelayed(MESSAGE_DISMSS_TIP, 3000);
+
+        if(map.checkMapLoaded()){
+            Types.Point point=mapView.converToScreenCoordinate(map_x_value,map_y_value);
+            Feature feature= mapView.selectFeature((float) point.x,(float) point.y);
+            if(feature!=null){
+                long featureId = LocationModel.id.get(feature);
+                mapView.setRenderableColor("Area",featureId, Color.BLUE);
+            }
+        }
     }
 
     private void dismissPopup() {
@@ -278,8 +321,7 @@ public class ShowMapFragemnt extends BaseMapFragment implements View.OnClickList
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {//回调的方法执行在子线程。
-                    Toast.makeText(getActivity(), "感谢您提供的宝贵信息", Toast.LENGTH_SHORT);
+                if (response.isSuccessful()) {//回调的方法执行在子线程
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

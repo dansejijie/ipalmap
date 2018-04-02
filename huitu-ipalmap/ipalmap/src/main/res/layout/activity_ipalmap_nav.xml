@@ -152,13 +152,18 @@
                         
                         <Button
                             android:id="@+id/ipalmap_nav_btn_moni"
-                            android:layout_width="140dp"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
                             android:layout_height="50dp"
-                            android:visibility="gone"/>
+                            android:text="模拟导航"
+                            android:textColor="@color/white"
+                            android:textSize="14sp"
+                            android:background="#6C7B8B"/>
 
                         <Button
                             android:id="@+id/ipalmap_nav_btn_start"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
                             android:layout_height="50dp"
                             android:layout_marginLeft="20dp"
                             android:text="开始导航"
@@ -174,196 +179,215 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/ipalmap_nav_search_container"
+
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="12dp"
-        android:visibility="visible"
-        >
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/ipalmap_ll_search_container"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:background="@color/white"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            >
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_margin="10dp"
-                android:background="@drawable/ipalmap_search" />
-
-            <EditText
-                android:id="@+id/ipalmap_nav_et_search"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:layout_weight="1"
-                android:background="@null"
-                android:textSize="14sp"
-                android:hint="输入起始地进行搜索" />
-
-            <Button
-                android:id="@+id/ipalmap_nav_btn_search"
-                android:layout_width="80dp"
-                android:layout_height="match_parent"
-                android:background="#7eaeef"
-                android:text="搜索"
-                android:textColor="@color/white"
-                android:textSize="14sp" />
-        </LinearLayout>
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/ipalmap_nav_naving_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/ipalmap_alpha_black"
-        android:orientation="vertical"
-        android:visibility="gone"
-        >
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            >
-
-            <ImageButton
-                android:id="@+id/ipalmap_naving_back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/icon_nav_left"/>
-
-            <TextView
-                android:id="@+id/ipalmap_nav_tv_naving"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="22sp"
-                android:textColor="@color/white"
-                android:maxLines="2"
-                tools:text="前方1米处向右转弯"
-                android:layout_marginLeft="12dp"/>
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/white"></View>
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/ipalmap_nav_search_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:gravity="center_horizontal">
-            <TextView
-                android:id="@+id/ipalmap_nav_tv_naving_start"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="@color/white"
-                tools:text="起点：F2"/>
-            <TextView
-                android:id="@+id/ipalmap_nav_tv_naving_end"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="@color/white"
-                tools:text="目的地：F2 I-I247.49"
-                android:layout_marginLeft="20dp"/>
-        </LinearLayout>
-    </LinearLayout>
+            android:padding="12dp"
+            android:visibility="visible"
+            >
 
-    <LinearLayout
-        android:id="@+id/ipalmap_nav_nav_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@color/white"
-        android:paddingRight="12dp"
-        android:visibility="gone"
-        >
-        <LinearLayout
-            android:id="@+id/ipalmap_nav_address_choose_back"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/icon_nav_left_grey"
-                />
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ipalmap_ll_search_container"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                >
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/ipalmap_search" />
+
+                <EditText
+                    android:id="@+id/ipalmap_nav_et_search"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:textSize="14sp"
+                    android:hint="输入起始地进行搜索" />
+
+                <Button
+                    android:id="@+id/ipalmap_nav_btn_search"
+                    android:layout_width="80dp"
+                    android:layout_height="match_parent"
+                    android:background="#7eaeef"
+                    android:text="搜索"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </RelativeLayout>
 
         <LinearLayout
+            android:id="@+id/ipalmap_nav_naving_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:background="@color/ipalmap_alpha_black"
+            android:orientation="vertical"
+            android:visibility="gone"
+            >
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="70dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
                 >
-                <TextView
-                    android:layout_width="40dp"
+
+                <ImageButton
+                    android:id="@+id/ipalmap_naving_back"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="起"
-                    android:textSize="14sp"
-                    android:textColor="@color/floor_list_name_color"
+                    android:background="@drawable/icon_nav_left"/>
+
+                <TextView
+                    android:id="@+id/ipalmap_nav_tv_naving"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="22sp"
+                    android:textColor="@color/white"
+                    android:maxLines="2"
+                    tools:text="前方1米处向右转弯"
                     android:layout_marginLeft="12dp"/>
-                <TextView
-                    android:id="@+id/ipalmap_nav_tv_start"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="请选择起点"
-                    android:textSize="14sp"
-                    android:textColor="@color/black"/>
             </LinearLayout>
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/gray_light"
-                android:layout_marginLeft="12dp"/>
+                android:background="@color/white"></View>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginLeft="12dp">
+                android:padding="8dp"
+                android:gravity="center_horizontal">
                 <TextView
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:text="终"
-                    android:textSize="14sp"
-                    android:textColor="@color/renderable_color"/>
-                <TextView
-                    android:id="@+id/ipalmap_nav_tv_end"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:text="F"
-                    android:textSize="14sp"
-                    android:textColor="@color/black"/>
-                <TextView
-                    android:id="@+id/ipalmap_nav_tv_floor"
+                    android:id="@+id/ipalmap_nav_tv_naving_start"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginLeft="4dp"
-                    tools:text="F2"
-                    android:textSize="14sp"
-                    android:textColor="@color/black"/>
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    tools:text="起点：F2"/>
+                <TextView
+                    android:id="@+id/ipalmap_nav_tv_naving_end"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    tools:text="目的地：F2 I-I247.49"
+                    android:layout_marginLeft="20dp"/>
             </LinearLayout>
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ipalmap_nav_nav_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/white"
+            android:paddingRight="12dp"
+            android:visibility="gone"
+            >
+            <LinearLayout
+                android:id="@+id/ipalmap_nav_address_choose_back"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/icon_nav_left_grey"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    >
+                    <TextView
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:text="起"
+                        android:textSize="14sp"
+                        android:textColor="@color/floor_list_name_color"
+                        android:layout_marginLeft="12dp"/>
+                    <TextView
+                        android:id="@+id/ipalmap_nav_tv_start"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="请选择起点"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/gray_light"
+                    android:layout_marginLeft="12dp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="12dp">
+                    <TextView
+                        android:layout_width="40dp"
+                        android:layout_height="wrap_content"
+                        android:text="终"
+                        android:textSize="14sp"
+                        android:textColor="@color/renderable_color"/>
+                    <TextView
+                        android:id="@+id/ipalmap_nav_tv_end"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="F"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"/>
+                    <TextView
+                        android:id="@+id/ipalmap_nav_tv_floor"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="4dp"
+                        tools:text="F2"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/ipalmap_map_control_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></RelativeLayout>
+
     </LinearLayout>
+
+
 
 </FrameLayout>

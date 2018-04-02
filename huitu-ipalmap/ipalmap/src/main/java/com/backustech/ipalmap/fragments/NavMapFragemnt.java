@@ -2,6 +2,7 @@ package com.backustech.ipalmap.fragments;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +36,7 @@ import com.palmaplus.nagrand.data.Feature;
 import com.palmaplus.nagrand.data.FeatureCollection;
 import com.palmaplus.nagrand.data.LocationModel;
 import com.palmaplus.nagrand.data.LocationPagingList;
+import com.palmaplus.nagrand.data.PlanarGraph;
 import com.palmaplus.nagrand.easyapi.LBSManager;
 import com.palmaplus.nagrand.easyapi.MockPositionManager;
 import com.palmaplus.nagrand.geos.Coordinate;
@@ -41,11 +45,16 @@ import com.palmaplus.nagrand.navigate.DynamicNavigateWrapper;
 import com.palmaplus.nagrand.navigate.DynamicNavigationMode;
 import com.palmaplus.nagrand.navigate.NavigateManager;
 import com.palmaplus.nagrand.position.Location;
+import com.palmaplus.nagrand.position.PositioningManager;
 import com.palmaplus.nagrand.position.ble.BeaconPositioningManager;
 import com.palmaplus.nagrand.view.MapView;
 import com.palmaplus.nagrand.view.gestures.OnSingleTapListener;
 import com.palmaplus.nagrand.view.overlay.ImageOverlay;
 import com.palmaplus.nagrand.view.overlay.LocationOverlay;
+import com.palmaplus.nagrand.view.overlay.OverlayCell;
+import com.palmaplus.nagrand.view.widgets.Compass;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 /**
  * Created by tygzx on 2018/3/29.
@@ -58,9 +67,11 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
     protected Handler mHandler;
     protected LBSManager lbsManager;
 
-    protected LocationOverlay locationOverlay;
+    private RelativeLayout rl_control_container;
+
     protected ImageOverlay startOverlay;
     protected ImageOverlay endOverlay;
+    protected String endName;//终点名字
 
     protected BeaconPositioningManager positionManager;
 
@@ -149,6 +160,7 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
         tv_naving_end = (TextView) view.findViewById(R.id.ipalmap_nav_tv_naving_end);
         tv_naving_middle = (TextView) view.findViewById(R.id.ipalmap_nav_tv_naving);
 
+        rl_control_container= (RelativeLayout) view.findViewById(R.id.ipalmap_map_control_container);
         //rl_positionContainer= (RelativeLayout) findViewById(R.id.ipalmap_nav_position_container);
 
         et_search.addTextChangedListener(new TextWatcher() {
@@ -174,26 +186,13 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                showStartEndView();
                 LocationModel locationModel = mData.getPOI(position);
                 Feature feature = map.mapView().selectFeature(LocationModel.id.get(locationModel));
                 String name = LocationModel.name.get(feature);
-                tv_start.setText(name);
-                tv_floor.setText("F2");
-                map.mapView().moveToFeature(feature, true, 1000);
                 startOverlay.init(new double[]{feature.getCentroid().getX(), feature.getCentroid().getY()});
-                // 设置点击所在的楼层为终点
                 startOverlay.mFloorId = map.getFloorId();
-                endOverlay.mFloorId = map.getFloorId();
-                lbsManager.navigateFromPoint(
-                        new Coordinate(startOverlay.getGeoCoordinate()[0], startOverlay.getGeoCoordinate()[1]),
-                        startOverlay.mFloorId,
-                        new Coordinate(endOverlay.getGeoCoordinate()[0], endOverlay.getGeoCoordinate()[1]),
-                        endOverlay.mFloorId,
-                        endOverlay.mFloorId
-                );
-                hasNavRoad = true;
-                mapView.getOverlayController().refresh();
+                //map.mapView().moveToFeature(feature, true, 1000);
+                showNavigationView(startOverlay,endOverlay,name);
             }
         });
 
@@ -219,9 +218,42 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
 
 
     protected void initData() {
+
+        //添加指南针
+        map.setDefaultWidgetContrainer(rl_control_container);
+        // 隐藏比例尺
+        map.getScale().setVisibility(View.GONE);
+        // 隐藏2D/3D
+        map.getSwitch().setVisibility(View.GONE);
+        // 隐藏楼层切换控件
+        map.getFloorLayout().setVisibility(View.GONE);
+
+        Compass compass=map.getCompass();
+
+        Bitmap compassBitmap=BitmapFactory.decodeResource(getResources(),R.drawable.icon_compass_north);
+        compass.setCompassImage(compassBitmap);
+        compass.setVisibility(View.VISIBLE);
+
+        final Bundle bundle = getArguments();
         mHandler = new Handler(this);
         mHandler.sendEmptyMessageDelayed(IPALMAP_REFRESH_END, 1500);
         mapView.setBackgroundColor(Color.parseColor("#c4e1ff"));
+
+        map.addOnChangePlanarGraph(new MapView.OnChangePlanarGraph() {
+            @Override
+            public void onChangePlanarGraph(PlanarGraph planarGraph, PlanarGraph planarGraph1, long l, long l1) {
+                //设置楼层
+                endOverlay.mFloorId = map.getFloorId();
+                Types.Point point=mapView.converToScreenCoordinate((float)bundle.getDouble("map_x_value"),(float)bundle.getDouble("map_y_value"));
+                Feature feature= mapView.selectFeature((float) point.x,(float) point.y);
+                endName=LocationModel.name.get(feature);
+                if(feature!=null){
+                    long featureId = LocationModel.id.get(feature);
+                    mapView.setRenderableColor("Area",featureId, Color.BLUE);
+                }
+                mapView.getOverlayController().refresh();
+            }
+        });
         mapView.setOnSingleTapListener(new OnSingleTapListener() {
             @Override
             public void onSingleTap(final MapView mapView, final float x, final float y) {
@@ -248,31 +280,14 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
 
-                                    showStartEndView();
-                                    tv_start.setText(name);
-
-                                    tv_end.setText("F");
-                                    tv_floor.setText("F2");
-
                                     Types.Point point = mapView.converToWorldCoordinate(x, y);
-                                    // 清除地图上的导航线
-                                    lbsManager.getNaviLayer().clearFeatures();
                                     // 设置点击的区域为起点
                                     startOverlay.init(new double[]{point.x, point.y});
                                     // 设置点击所在的楼层为终点
                                     startOverlay.mFloorId = map.getFloorId();
-                                    //todo
-                                    endOverlay.mFloorId = map.getFloorId();
 
-                                    lbsManager.navigateFromPoint(
-                                            new Coordinate(startOverlay.getGeoCoordinate()[0], startOverlay.getGeoCoordinate()[1]),
-                                            startOverlay.mFloorId,
-                                            new Coordinate(endOverlay.getGeoCoordinate()[0], endOverlay.getGeoCoordinate()[1]),
-                                            endOverlay.mFloorId,
-                                            endOverlay.mFloorId
-                                    );
-                                    hasNavRoad = true;
-                                    mapView.getOverlayController().refresh();
+                                    showNavigationView(startOverlay,endOverlay,name);
+
                                 }
                             }).show();
                 } else {
@@ -335,17 +350,6 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
         // 设置定位点离导航线5米外就触发离开导航线的回调
         lbsManager.setCorrectionRadius(5);
 
-        Bundle bundle = getArguments();
-
-
-        // 创建一个定位的Overlay
-        locationOverlay = new LocationOverlay(getContext(), mapView, 1000);
-        // 初始化Overlay的位置
-        locationOverlay.init(new double[]{0, 0});
-        locationOverlay.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.btn_nav));
-        // 添加Overlay
-        map.addOverlay(locationOverlay);
-
         startOverlay = new ImageOverlay(getContext());
         startOverlay.setBackgroundResource(R.drawable.ipalmap_start);
         startOverlay.init(new double[]{0, 0});
@@ -356,19 +360,6 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
         endOverlay.init(new double[]{bundle.getDouble("map_x_value"), bundle.getDouble("map_y_value")});
         //endOverlay.init(new double[]{0,0});
         map.addOverlay(endOverlay);
-
-//        // 创建一个根据导航线模拟导航的管理器
-//        positionManager = new BeaconPositioningManager(getContext(), Constant.APP_KEY);
-//        // 定位监听的事件，如果得到了新的位置数据，就会调用这个方法
-//        positionManager.setOnLocationChangeListener(new PositioningManager.OnLocationChangeListener<BleLocation>() {
-//            @Override
-//            public void onLocationChange(PositioningManager.LocationStatus locationStatus, BleLocation bleLocation, BleLocation t1) {
-//                Coordinate coordinate = t1.getPoint().getCoordinate();
-//                Log.d("onLocationChange", "x = " + coordinate.getX() + ", y =" +
-//                        " " + coordinate.getY());
-//            }
-//        });
-
 
         // 蓝牙定位管理对象
         positionManager = new BeaconPositioningManager(getContext(), Constant.APP_KEY);
@@ -394,6 +385,7 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
         ll_nav_container.setVisibility(View.GONE);
         fl_bottom_container.setVisibility(View.GONE);
         ll_search_container.setVisibility(View.VISIBLE);
+        ib_naving.setVisibility(View.VISIBLE);
     }
 
     private void showSearchResultView() {
@@ -407,6 +399,7 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
         ll_listview_container.setVisibility(View.VISIBLE);
         lv_search.setVisibility(View.VISIBLE);
         ll_floordown_container.setVisibility(View.VISIBLE);
+        ib_naving.setVisibility(View.VISIBLE);
         ll_floorup_container.setVisibility(View.GONE);
 
     }
@@ -418,6 +411,7 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
         ll_search_container.setVisibility(View.VISIBLE);
         fl_bottom_container.setVisibility(View.VISIBLE);
         ll_listview_container.setVisibility(View.VISIBLE);
+        ib_naving.setVisibility(View.VISIBLE);
         lv_search.setVisibility(View.GONE);
         ll_floordown_container.setVisibility(View.GONE);
         ll_floorup_container.setVisibility(View.VISIBLE);
@@ -425,9 +419,11 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
 
     private void showStartEndView() {
 
+
         ll_search_container.setVisibility(View.GONE);
         ll_listview_container.setVisibility(View.GONE);
         ll_naving_container.setVisibility(View.GONE);
+        ib_naving.setVisibility(View.GONE);
 
         ll_nav_container.setVisibility(View.VISIBLE);
         fl_bottom_container.setVisibility(View.VISIBLE);
@@ -445,17 +441,26 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
         ll_floorup_container.setVisibility(View.GONE);
 
         ll_naving_container.setVisibility(View.VISIBLE);
+        ib_naving.setVisibility(View.VISIBLE);
     }
 
     private void showStartEndNoStartView() {
-        tv_start.setText("请选择起点");
+
     }
 
     private void search() {
+
+
         String content = et_search.getText().toString();
         if (TextUtils.isEmpty(content)) {
             return;
         }
+
+        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+        et_search.setText("");
+        et_search.clearFocus();
+
         // 根据关键字搜索
         map.dataSource().search(content, 0, 10, new long[]{map.getFloorId()}, null, new DataSource.OnRequestDataEventListener<LocationPagingList>() {
             @Override
@@ -480,10 +485,34 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
         });
     }
 
+    private void showNavigationView(OverlayCell startCell,OverlayCell endCell,String startName){
+
+        // 清除地图上的导航线
+        lbsManager.getNaviLayer().clearFeatures();
+        lbsManager.navigateFromPoint(
+                new Coordinate(startCell.getGeoCoordinate()[0], startCell.getGeoCoordinate()[1]),
+                startCell.getFloorId(),
+                new Coordinate(endCell.getGeoCoordinate()[0], endCell.getGeoCoordinate()[1]),
+                endOverlay.getFloorId(),
+                endOverlay.getFloorId()
+        );
+
+        hasNavRoad = true;
+
+        showStartEndView();
+        tv_naving_start.setText("起点:"+startName);
+        tv_naving_end.setText("目的地:"+endName);
+        tv_start.setText(startName);
+        tv_end.setText(endName);
+
+        mapView.getOverlayController().refresh();
+    }
+
+
     @Override
     public void onDestroyView() {
+        lbsManager.stopUpdatingLocation();
         lbsManager.close();
-        positionManager.stop();
         super.onDestroyView();
     }
 
@@ -502,6 +531,7 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+
         int id = v.getId();
         if (id == R.id.ipalmap_nav_btn_search) {
             search();
@@ -516,12 +546,24 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
             //地图缩小
             mapView.zoomOut();
         } else if (id == R.id.ipalmap_nav_ib_naving) {
+            LocationOverlay locationOverlay=lbsManager.locationOverlay();
+            //表示定位点确认可以导航了
+            if(locationOverlay.getGeoCoordinate()[0]>0){
+                showNavigationView(locationOverlay,endOverlay,"定位点");
+            }
 
-//            // 开始动态导航
-//            lbsManager.startDynamic();
-//            // 开始跟新定位点
-//            lbsManager.startUpdatingLocation();
+        }else if(id==R.id.ipalmap_nav_btn_moni){
+            lbsManager.stopUpdatingLocation();
+            lbsManager.switchPostionType(mockPositionManager);
+            mockPositionManager.attchLBSManager(lbsManager);
+            // 开始动态导航
+            lbsManager.startDynamic();
+            // 开始跟新定位点
+            lbsManager.startUpdatingLocation();
+            showNavingView();
         } else if (id == R.id.ipalmap_nav_btn_start) {
+
+            lbsManager.switchPostionType(positionManager);
             // 开始动态导航
             lbsManager.startDynamic();
             // 开始跟新定位点
@@ -531,7 +573,6 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
 
         } else if (id == R.id.ipalmap_nav_address_choose_back) {
             if (hasNavRoad) {
-                showStartEndNoStartView();
                 // 清除地图上的导航线
                 startOverlay.init(new double[]{0, 0});
                 lbsManager.getNaviLayer().clearFeatures();
@@ -545,6 +586,8 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
             lbsManager.stopUpdatingLocation();
             lbsManager.getNaviLayer().clearFeatures();
             startOverlay.init(new double[]{0, 0});
+            lbsManager.switchPostionType(positionManager);
+            lbsManager.startUpdatingLocation();
             mapView.getOverlayController().refresh();
             showInitView();
         }
@@ -564,9 +607,7 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
                     mapView.getOverlayController().refresh();
                     showInitView();
                     Toast.makeText(getContext(), "您已到达目的地", Toast.LENGTH_LONG).show();
-
                 }
-
                 break;
             case IPALMAP_REFRESH_END:
                 endOverlay.mFloorId = map.getFloorId();
@@ -576,7 +617,7 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
 
                 } else {
                     lbsManager.switchPostionType(positionManager);
-                    positionManager.start();
+                    lbsManager.startUpdatingLocation();
                 }
 
                 break;

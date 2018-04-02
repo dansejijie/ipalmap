@@ -10,17 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Spinner
-        android:id="@+id/ipalmap_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_margin="10dp"
-        android:visibility="invisible"/>
-
     <RelativeLayout
         android:id="@+id/ipalmap_map_overlay_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
 
 </RelativeLayout>
