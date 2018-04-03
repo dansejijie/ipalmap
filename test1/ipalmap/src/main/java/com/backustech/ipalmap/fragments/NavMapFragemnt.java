@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.backustech.ipalmap.R;
+import com.backustech.ipalmap.activity.IpalmapActivity;
 import com.backustech.ipalmap.adapter.IpalmapSearchAdapter;
 import com.backustech.ipalmap.utils.Constant;
 import com.palmaplus.nagrand.core.Types;
@@ -338,9 +339,11 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
                         tv_naving_middle.postOnAnimation(new Runnable() {
                             @Override
                             public void run() {
-                                tv_naving_middle.setText(text+Math.random()+"1");
+                                tv_naving_middle.setText(text);
                                 if (text.equals("到达")) {
                                     Toast.makeText(getContext(), "您已到达目的地", Toast.LENGTH_LONG).show();
+                                    stopNaving();
+                                    ((IpalmapActivity)getActivity()).directShowBookShelf();
                                 }
                             }
                         });
@@ -597,16 +600,20 @@ public class NavMapFragemnt extends BaseMapFragment implements View.OnClickListe
                 showInitView();
             }
         } else if (id == R.id.ipalmap_naving_back) {
-            lbsManager.stopDynamic();
-            lbsManager.stopUpdatingLocation();
-            lbsManager.getNaviLayer().clearFeatures();
-            startOverlay.init(new double[]{0, 0});
-            lbsManager.switchPostionType(positionManager);
-            lbsManager.startUpdatingLocation();
-            tv_naving_middle.setText("");
-            mapView.getOverlayController().refresh();
-            showInitView();
+            stopNaving();
         }
+    }
+
+    private void stopNaving(){
+        lbsManager.stopUpdatingLocation();
+        lbsManager.stopDynamic();
+        lbsManager.getNaviLayer().clearFeatures();
+        startOverlay.init(new double[]{0, 0});
+        lbsManager.switchPostionType(positionManager);
+        lbsManager.startUpdatingLocation();
+        tv_naving_middle.setText("");
+        mapView.getOverlayController().refresh();
+        showInitView();
     }
 
 }

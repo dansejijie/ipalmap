@@ -236,6 +236,11 @@ public class ShowMapFragemnt extends BaseMapFragment implements View.OnClickList
             map_x_value = bundle.getDouble("map_x_value");
             map_y_value = bundle.getDouble("map_y_value");
             initTextView();
+            if(bundle.getBoolean("showBookShelf",false)){
+                popupBookShelf();
+            }
+
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -317,6 +322,8 @@ public class ShowMapFragemnt extends BaseMapFragment implements View.OnClickList
                 mapView.setRenderableColor("Area",featureId, Color.BLUE);
             }
         }
+
+
     }
 
     private void dismissPopup() {

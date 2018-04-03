@@ -108,6 +108,15 @@ public class IpalmapActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+    public void directShowBookShelf(){
+        showShowHeaderBarMap();
+        showFragment = new ShowMapFragemnt();
+        Bundle bundle=new Bundle(mData);
+        bundle.putBoolean("showBookShelf",true);
+        showFragment.setArguments(bundle);
+        FragmentUtils.replaceFragment(getSupportFragmentManager(), showFragment, R.id.ipalmap_fragment_container, false);
+    }
+
     private void getDataAsync() {
 
         String call_number = "";
@@ -145,6 +154,8 @@ public class IpalmapActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
     }
+
+
 
     private void handleBookJSON(String json) {
 
