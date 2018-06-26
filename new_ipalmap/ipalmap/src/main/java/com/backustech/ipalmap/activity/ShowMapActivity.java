@@ -357,12 +357,13 @@ public class ShowMapActivity extends Activity implements View.OnClickListener {
                         tv_book_number.setText(mData.getString("bookNumber"));
                         tv_bookshelf_guide.setText(mData.getString("bookshelfGuide"));
 
-                        ll_bubbleError.postOnAnimationDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                ll_bubbleError.setVisibility(View.GONE);
-                            }
-                        }, 3000);
+//                        ll_bubbleError.postOnAnimationDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                ll_bubbleError.setVisibility(View.GONE);
+//                            }
+//                        }, 3000);
+                        ll_bubbleError.setVisibility(View.GONE);
                         final List<Feature> features = mapView.searchFeaturesByWorldCoordinate(
                                 new Coordinate(mData.getDouble("map_x_value"), mData.getDouble("map_y_value")));
                         if (features == null || features.isEmpty()) {
@@ -374,7 +375,7 @@ public class ShowMapActivity extends Activity implements View.OnClickListener {
                         //修改目标Poi背景颜色
                         mapView.updateRendererColor(features.get(0).getId(), Color.BLUE);
                     }
-                },1500);
+                },2500);
             }
         });
         //设置地图加载错误回调

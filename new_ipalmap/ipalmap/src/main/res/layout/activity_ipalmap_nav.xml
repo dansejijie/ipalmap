@@ -397,7 +397,15 @@
         <RelativeLayout
             android:id="@+id/ipalmap_map_control_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></RelativeLayout>
+            android:layout_height="match_parent">
+
+            <ProgressBar
+                android:visibility="gone"
+                android:layout_centerInParent="true"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:id="@+id/ipalmap_nav_progress"/>
+        </RelativeLayout>
 
     </LinearLayout>
 

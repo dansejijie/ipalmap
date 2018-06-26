@@ -1,242 +1,501 @@
 {
-  "mapBackgroundColor": "#e0eaf6",
-  "frame": {
-    "visible": true,
-    "height": -0.01,
-    "fillColor": "#FBF1DC",
-    "outLineColor": "#000000",
-    "enableOutLine": false,
-    "outLineWidth": 5.0
-  },
-  "area": {
-    "default": {
-      "visible": true,
-      "height": 0.01,
-      "fillColor": "#ffffff",
-      "enableOutLine": false,
-      "outLineColor": "#ffffff",
-      "outLineWidth": 1.0
+    "mapBackgroundColor": "#efe6f3",
+    "frame": {
+        "visible": true,
+        "height": -0.01,
+        "fillColor": "#fbf1dc"
     },
-    "style": {
-      "keys": [
-        "id",
-        "categoryid"
-      ],
-      "values": [
-        {
-          "key": [
-            "37001000"
-          ],
-          "height": 0.8,
-          "fillColor": "#B1D1F2"
+    "area": {
+        "default": {
+            "visible": true,
+            "height": 1.0,
+            "fillColor": "#d1c3b1",
+            "enableOutLine": true,
+            "outLineColor": "#c0aa94"
         },
-        {
-          "key": [
-            "23024000",
-            "23025000",
-            "11001000",
-            "11401000"
-          ],
-          "height": 2,
-          "fillColor": "#C3E2F7",
-          "enableOutLine": true,
-          "outLineColor": "#DEDEDE"
-        },
-        {
-          "key": [
-            "23027000",
-            "23001000",
-            "04KI06F0110020"
-          ],
-          "height": 2,
-          "fillColor": "#FFD7E2",
-          "enableOutLine": true,
-          "outLineColor": "#DEDEDE"
-        },
-        {
-          "key": [
-            "24001000",
-            "24004000"
-          ],
-          "height": 2.05,
-          "fillColor": "#E4F2F7",
-          "enableOutLine": true,
-          "outLineColor": "#FFFFFF"
-        },
-        {
-          "key": [
-            "23054000"
-          ],
-          "height": 2,
-          "fillColor": "#C3E2F7"
-        },
-        {
-          "key": [
-            "33042000"
-          ],
-          "height": 2,
-          "fillColor": "#DEDEDE"
-        },
-        {
-          "key": [
-            "35002000"
-          ],
-          "height": 0.2,
-          "fillColor": "#CFEEBB"
-        },
-        {
-          "key": [
-            "17004000"
-          ],
-          "height": 0,
-          "fillColor": "#89919A"
-        },
-        {
-          "key": [
-            "22086000"
-          ],
-          "height": 0.02,
-          "fillColor": "#FFFFFF"
-        },
-        {
-          "key": [
-            "22082000"
-          ],
-          "height": 0.02,
-          "fillColor": "#F7D685"
-        },
-        {
-          "key": [
-            "22001000",
-            "22004000"
-          ],
-          "height": 0.04,
-          "fillColor": "#DEC181",
-          "enableOutLine": true,
-          "outLineColor": "#ffffff"
-        },
-        {
-          "key": [
-            "15000000"
-          ],
-          "height": 2,
-          "fillColor": "#E4F2F7"
-        },
-        {
-          "key": [
-            "23999000"
-          ],
-          "height": 2,
-          "enableOutLine": false,
-          "outLineColor": "#000000",
-          "outLineWidth": 1.0,
-          "fillColor": "#DFDFDF"
-        },
-        {
-          "key": [
-            "23051000"
-          ],
-          "height": 1,
-          "fillColor": "#B6D0F1"
-        },
-        {
-          "key": [
-            "24091000"
-          ],
-          "height": 2,
-          "fillColor": "#F5E752"
-        },
-        {
-          "key": [
-            "24097000",
-            "23000000",
-            "23004000",
-            "15026000"
-          ],
-          "height": 2,
-          "fillColor": "#B6D0F1"
-        },
-        {
-          "key": [
-            "37000000"
-          ],
-          "visible": false,
-          "height": 2,
-          "fillColor": "#fcff00",
-          "enableOutLine": false
+        "style": {
+            "keys": [
+                     "id",
+                     "display",
+                     "categoryid"
+                     ],
+            "values": [
+                       {
+                       "key": [
+                               "24001000"
+                               ],
+                       "visible": true,
+                       "height": 0.5,
+                       "fillColor": "#e8c7a4",
+                       "enableOutLine": true,
+                       "outLineColor": "#c7935b"
+                       },
+                       {
+                       "key": [
+                               "15017000"
+                               ],
+                       "visible": true,
+                       "height": 0.5,
+                       "fillColor": "#a7e1c4",
+                       "enableOutLine": true,
+                       "outLineColor": "#76d0a3"
+                       },
+                       {
+                       "key": [
+                               "21066000"
+                               ],
+                       "visible": true,
+                       "height": 0.5,
+                       "fillColor": "#ffaaa6",
+                       "enableOutLine": true,
+                       "outLineColor": "#ffaaa6"
+                       },
+                       {
+                       "key": [
+                               "2563491",
+                               "2563447"
+                               ],
+                       "visible": true,
+                       "height": 0.1,
+                       "fillColor": "#ffffff",
+                       "enableOutLine": true,
+                       "outLineColor": "#ffffff"
+                       },
+                       {
+                       "key": [
+                               "35002000"
+                               ],
+                       "visible": true,
+                       "height": 0.1,
+                       "fillColor": "#a7e1c4",
+                       "enableOutLine": true,
+                       "outLineColor": "#a7e1c4"
+                       },
+                       {
+                       "key": [
+                               "24002000"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#add8f7",
+                       "enableOutLine": true,
+                       "outLineColor": "#7ec2f3"
+                       },
+                       {
+                       "key": [
+                               "24005000"
+                               ],
+                       "visible": true,
+                       "height": 0.7,
+                       "fillColor": "#dfc27d",
+                       "enableOutLine": true,
+                       "outLineColor": "#bf812d"
+                       },
+                       {
+                       "key": [
+                               "22001000",
+                               "22004000"
+                               ],
+                       "visible": true,
+                       "height": 0.01,
+                       "fillColor": "#DEC181",
+                       "enableOutLine": true,
+                       "outLineColor": "#ffffff"
+                       },
+                       {
+                       "key": [
+                               "15000000"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#a7e1c4",
+                       "enableOutLine": true,
+                       "outLineColor": "#76d0a3"
+                       },
+                       {
+                       "key": [
+                               "2175126"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#fcb8d3",
+                       "enableOutLine": true,
+                       "outLineColor": "#fa90ba"
+                       },
+                       {
+                       "key": [
+                               "2175127",
+                               "2175125"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#a7e1c4",
+                       "enableOutLine": true,
+                       "outLineColor": "#76d0a3"
+                       },
+                       {
+                       "key": [
+                               "2175128"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#cfcaf6",
+                       "enableOutLine": true,
+                       "outLineColor": "#b3acf2"
+                       },
+                       
+                       {
+                       "key": [
+                               "12010000"
+                               ],
+                       "visible": true,
+                       "height": 0.2,
+                       "fillColor": "#fdd8e7",
+                       "enableOutLine": true,
+                       "outLineColor": "#fcb8d3"
+                       },
+                       {
+                       "key": [
+                               "23038000"
+                               ],
+                       "visible": true,
+                       "height": 0.3,
+                       "fillColor": "#fde3cf",
+                       "enableOutLine": true,
+                       "outLineColor": "#91c8fe"
+                       },
+                       {
+                       "key": [
+                               "23003000"
+                               ],
+                       "visible": true,
+                       "height": 0.1,
+                       "fillColor": "#ffffff",
+                       "enableOutLine": true,
+                       "outLineColor": "#cccccc"
+                       },
+                       {
+                       "key": [
+                               "2508473"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#f46e65",
+                       "enableOutLine": true,
+                       "outLineColor": "#f04134"
+                       },
+                       
+                       {
+                       "key": [
+                               "17004000"
+                               ],
+                       "visible": true,
+                       "height": 0.5,
+                       "fillColor": "#ffe9a7",
+                       "enableOutLine": true,
+                       "outLineColor": "#ffce3d"
+                       },
+                       {
+                       "key": [
+                               "15011000",
+                               "22072000"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#a7dfe3",
+                       "enableOutLine": true,
+                       "outLineColor": "#76cdd3"
+                       },
+                       {
+                       "key": [
+                               "17009000",
+                               "17002000",
+                               "22095000",
+                               "23010000"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#fcb8d3",
+                       "enableOutLine": true,
+                       "outLineColor": "#fa90ba"
+                       },
+                       {
+                       "key": [
+                               "纺织服装周刊"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#fabeb9",
+                       "enableOutLine": true,
+                       "outLineColor": "#f79992"
+                       },
+                       {
+                       "key": [
+                               "23041000"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#91c8fe",
+                       "enableOutLine": true,
+                       "outLineColor": "#91c8fe"
+                       },
+                       
+                       {
+                       "key": [
+                               "23054000"
+                               ],
+                       "visible": true,
+                       "height": 0.1,
+                       "fillColor": "#91c8fe",
+                       "enableOutLine": true,
+                       "outLineColor": "#faaf76"
+                       },
+                       {
+                       "key": [
+                               "23004000"
+                               ],
+                       "visible": true,
+                       "height": 0.3,
+                       "fillColor": "#91c8fe",
+                       "enableOutLine": true,
+                       "outLineColor": "#91c8fe"
+                       },
+                       
+                       {
+                       "key": [
+                               "22001000"
+                               ],
+                       "visible": true,
+                       "height": 0.2,
+                       "fillColor": "#FFEBAF",
+                       "enableOutLine": true,
+                       "outLineColor": "#cccccc"
+                       },
+                       {
+                       "key": [
+                               "21003000",
+                               "16003000"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#91c8fe",
+                       "enableOutLine": true,
+                       "outLineColor": "#c0aa94"
+                       },
+                       
+                       {
+                       "key": [
+                               "23043000"
+                               ],
+                       "visible": true,
+                       "height": 0.15,
+                       "fillColor": "#cfefdf",
+                       "enableOutLine": true,
+                       "outLineColor": "#cfefdf"
+                       },
+                       
+                       {
+                       "key": [
+                               "23043000"
+                               ],
+                       "visible": true,
+                       "height": 0.15,
+                       "fillColor": "#cfefdf",
+                       "enableOutLine": true,
+                       "outLineColor": "#cfefdf"
+                       },
+                       
+                       {
+                       "key": [
+                               "21047000"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#dee8dc",
+                       "enableOutLine": true,
+                       "outLineColor": "#c0aa94"
+                       },
+                       
+                       {
+                       "key": [
+                               "23006000"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#ffffff",
+                       "enableOutLine": true,
+                       "outLineColor": "#cccccc"
+                       },
+                       
+                       {
+                       "key": [
+                               "23018000"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#f4f3fd",
+                       "enableOutLine": true,
+                       "outLineColor": "#c0aa94"
+                       },
+                       
+                       {
+                       "key": [
+                               "23999000"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#e9e9e9",
+                       "enableOutLine": true,
+                       "outLineColor": "#d9d9d9"
+                       },
+                       {
+                       "key": [
+                               "23062000"
+                               ],
+                       "visible": true,
+                       "height": 0.1,
+                       "fillColor": "#deebf7",
+                       "enableOutLine": true,
+                       "outLineColor": "#666666"
+                       },
+                       {
+                       "key": [
+                               "23024000",
+                               "23025000",
+                               "23059000",
+                               "23063000"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#cfcaf6",
+                       "enableOutLine": true,
+                       "outLineColor": "#b3acf2"
+                       },
+                       
+                       {
+                       "key": [
+                               "24091000",
+                               "24097000",
+                               "24092000",
+                               "24098000"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#ffe9a7",
+                       "enableOutLine": true,
+                       "outLineColor": "#ffdd76"
+                       },
+                       {
+                       "key": [
+                               "24093000",
+                               "24094000",
+                               "24095000",
+                               "24096000"
+                               ],
+                       "visible": true,
+                       "height": 0.2,
+                       "fillColor": "#ffe9a7",
+                       "enableOutLine": true,
+                       "outLineColor": "#ffdd76"
+                       },
+                       {
+                       "key": [
+                               "12008000",
+                               "23019000"
+                               ],
+                       "visible": true,
+                       "height": 0.1,
+                       "fillColor": "#fabeb9",
+                       "enableOutLine": true,
+                       "outLineColor": "#f79992"
+                       },
+                       {
+                       "key": [
+                               "21008000",
+                               "21005000",
+                               "21049000"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#fabeb9",
+                       "enableOutLine": true,
+                       "outLineColor": "#f79992"
+                       },
+                       
+                       {
+                       "key": [
+                               "35003000"
+                               ],
+                       "visible": true,
+                       "height": 1.0,
+                       "fillColor": "#cbe6a3",
+                       "enableOutLine": true,
+                       "outLineColor": "#c0aa94"
+                       },
+                       {
+                       "key": [
+                               "37000000"
+                               ],
+                       "visible": true,
+                       "height": 0.3,
+                       "fillColor": "#ffffff",
+                       "enableOutLine": true,
+                       "outLineColor": "#ffffff"
+                       }
+                       ]
         }
-      ]
-    }
-  },
-  "areaText": {
-    "default": {
-      "visible": true,
-      "textSize": 14,
-      "textField": "display",
-      "type": "online",
-      "baseUrl": "http://palmap-source.oss-cn-shanghai.aliyuncs.com/logo/",
-      "iconField": "logo",
-      "iconWidth": 20,
-      "iconHeight": 20,
-      "localIcon": "img/bbb.jpg",
-      "backGroundColor": "#00000000",
-      "foreGroundColor": "#000000",
-      "enableOutLine": false,
-      "outLineColor": "#ffffff",
-      "outLineWidth": 0.0
     },
-    "style": {
-      "keys": [
-        "categoryid"
-      ],
-      "values": [
-        {
-          "key": [
-            "22001000",
-            "22004000",
-            "17004000"
-          ],
-          "textSize": 16
+    "areaText": {
+        "default": {
+            "visible": true,
+            "textSize": 14,
+            "textColor": "#0f1923",
+            "textWeight": "Light"
+        },
+        "style": {
+            "keys": [
+                     "id",
+                     "categoryid"
+                     ],
+            "values": [
+            ]
         }
-      ]
-    }
-  },
-  "facility": {
-    "default": {
-      "visible": true,
-      "type": "online",
-      "baseUrl": "http://palmap-source.oss-cn-shanghai.aliyuncs.com/logo/",
-      "iconField": "logo",
-      "iconWidth": 20,
-      "iconHeight": 20,
-      "anchor_x": 0.5,
-      "anchor_y": 0.5
     },
-    "style": {
-      "keys": [
-        "id",
-        "categoryid"
-      ],
-      "values": [
-        {
-          "key": [
-            "22001000",
-            "22002000",
-            "22003000",
-            "22004000",
-            "23051000",
-            "23000000",
-            "15000000"
-          ],
-          "visible": false
+    "facility": {
+        "default": {
+            "visible": true,
+            "type": "online",
+            "baseUrl": "http://palmap-source.oss-cn-shanghai.aliyuncs.com/logo/",
+            "iconField": "logo",
+            "localIcon": "ic_elevator",
+            "iconWidth": 20,
+            "iconHeight": 20
+        },
+        "style": {
+            "keys": [
+                     "id",
+                     "categoryid"
+                     ],
+            "values": [
+                       {
+                       "key": [
+                               "22001000",
+                               "22002000",
+                               "22003000",
+                               "22004000",
+                               "23051000",
+                               "23000000",
+                               "15000000"
+                               ],
+                       "visible": false
+                       }
+                       ]
         }
-      ]
-    }
-  },
+    },
   "navigationLayer": {
     "default": {
-      "width": 3.0,
-      "height": 0.02,
+      "width": 1.5,
+      "height" : 0.02,
       "color": "#ffffff",
       "image": "img/navi_arrow.png"
     },
@@ -244,17 +503,18 @@
       {
         "name": "line1",
         "width": 3.0,
-        "height": 0.02,
+        "height" : 0.02,
         "color": "#ffffff",
         "image": "img/navi_arrow.png"
       },
       {
         "name": "line2",
         "width": 1.0,
-        "height": 0.02,
+        "height" : 0.02,
         "color": "#ffffff",
         "image": "img/navi_arrow_grey.png"
       }
     ]
   }
 }
+

@@ -1,0 +1,11 @@
+<resources>
+    <style name="WindowTitleBackground" >
+        <item name="android:background">@color/primary_deep_blue</item>
+    </style>
+    <style name="IpalmapHeaderBar"  parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">false</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowActionBarOverlay">false</item>
+        <item name="android:windowTitleBackgroundStyle">@style/WindowTitleBackground</item>
+    </style>
+</resources>

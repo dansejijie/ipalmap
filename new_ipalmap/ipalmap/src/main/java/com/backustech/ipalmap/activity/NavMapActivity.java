@@ -24,6 +24,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -121,6 +122,7 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
     Boolean mapLoaded;
 
     RelativeLayout rl_control_container;
+    ProgressBar pb_Bar;
 
     String startName;
     String endName;//终点名字
@@ -131,6 +133,7 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
 
     boolean isMoniNaving;
     boolean isFirstArrived;//用来做导航结束后的回调标志
+    boolean isRestartNaving;//当偏离导航时 ，重新请求导航路线
 
     SimpleImageMarker startMarker, endMarker;
     Position locationPosition;
@@ -233,6 +236,8 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
 
         rl_control_container = (RelativeLayout) findViewById(R.id.ipalmap_map_control_container);
 
+        pb_Bar=findViewById(R.id.ipalmap_nav_progress);
+
         et_search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -309,7 +314,13 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
         palmap.setOnRouteRequestListener(new OnRouteRequestListener() {
             @Override
             public void onRequestSucceed() {
+                pb_Bar.setVisibility(View.GONE);
                 hasNavRoad = true;
+                if(isRestartNaving){
+                    isRestartNaving=false;
+                    //偏离只出现在实际导航上
+                    palmap.getNavigateManager().start(false, 1, 1000);
+                }
             }
 
             @Override
@@ -326,7 +337,34 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
                 //此处可以获取导航回调信息
                 if (naviInfo != null) {
                     tv_naving_middle.setText(naviInfo.getNaviTip());
-                    if (naviInfo.getNextAction() == ActionState.ACTION_ARRIVE && naviInfo.getTotalRemainLength() < 0.3 && !isFirstArrived) {
+
+                    if(true){
+                        if(naviInfo.getDistance()>5){
+
+                            palmap.getNavigateManager().stop();
+                            //清除导航线
+                            palmap.clearNavigateRoute();
+                            //清除导航数据
+                            palmap.getNavigateManager().clear();
+
+                            isRestartNaving=true ;
+
+                            Coordinate coord=new Coordinate(locationPosition.getX(), locationPosition.getY());
+                            if (startMarker == null) {
+                                startMarker = new SimpleImageMarker(NavMapActivity.this, coord, mapView.getCurrentFloorId());
+                                startMarker.setImageResource(R.drawable.ipalmap_start);
+                                mapView.addOverlay(startMarker);
+                            } else {
+                                startMarker.coordinate(new Coordinate(coord.x, coord.y));
+                                mapView.refreshOverlay();
+                            }
+                            pb_Bar.setVisibility(View.VISIBLE);
+                            palmap.requestRoute(
+                                    startMarker.getGeoCoordinate().x, startMarker.getGeoCoordinate().y, startMarker.getFloorId(),
+                                    endMarker.getGeoCoordinate().x, endMarker.getGeoCoordinate().y, endMarker.getFloorId());
+                        }
+                    }
+                    else if (naviInfo.getNextAction() == ActionState.ACTION_ARRIVE && naviInfo.getTotalRemainLength() < 0.3 && !isFirstArrived) {
                         isFirstArrived = true;
                         Toast.makeText(NavMapActivity.this, "您已到达目的地", Toast.LENGTH_LONG).show();
                         if (!isMoniNaving) {
@@ -340,6 +378,8 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
                         stopNaving();
                     }
                 }
+
+
             }
 
             @Override
@@ -456,6 +496,7 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
         //清除导航数据
         palmap.getNavigateManager().clear();
 
+        pb_Bar.setVisibility(View.VISIBLE);
         palmap.requestRoute(
                 startMarker.getGeoCoordinate().x, startMarker.getGeoCoordinate().y, startMarker.getFloorId(),
                 endMarker.getGeoCoordinate().x, endMarker.getGeoCoordinate().y, endMarker.getFloorId());
@@ -694,7 +735,7 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
         }
         if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
             float value = event.values[0];
-            palmap.updatemAzimuth(value - (float) mapView.getRotate());
+            palmap.updatemAzimuth(value - (float) mapView.getRotate()+180);
         }
     }
 
