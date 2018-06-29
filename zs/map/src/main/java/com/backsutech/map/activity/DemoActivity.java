@@ -19,8 +19,12 @@ public class DemoActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(DemoActivity.this, ShowMapActivity.class);
-                intent.putExtra("call_number", "K109/426/2015");
+                intent.putExtra("call_number", "00001084");
                 intent.putExtra("book_name", "书目名字");
+                intent.putExtra("org_id","144");
+                intent.putExtra("location","1");
+                intent.putExtra("group","1");
+
                 startActivity(intent);
             }
         });

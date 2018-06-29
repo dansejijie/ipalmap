@@ -501,7 +501,6 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
                 startMarker.getGeoCoordinate().x, startMarker.getGeoCoordinate().y, startMarker.getFloorId(),
                 endMarker.getGeoCoordinate().x, endMarker.getGeoCoordinate().y, endMarker.getFloorId());
         showStartEndView();
-
     }
 
 

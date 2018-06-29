@@ -1,6 +1,7 @@
 package com.backsutech.map.activity;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -15,6 +16,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -31,36 +33,47 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.backsutech.map.R;
 import com.backsutech.map.adapter.IpalmapSearchAdapter;
+import com.brtbeacon.locationengine.ble.BRTBeacon;
+import com.brtbeacon.locationengine.ble.BRTLocationManager;
+import com.brtbeacon.locationengine.ble.BRTPublicBeacon;
 import com.brtbeacon.map.map3d.BRTMapEnvironment;
 import com.brtbeacon.map.map3d.BRTMapView;
 import com.brtbeacon.map.map3d.entity.BRTFloorInfo;
 import com.brtbeacon.map.map3d.entity.BRTPoi;
 import com.brtbeacon.map.map3d.entity.BRTPoiEntity;
 import com.brtbeacon.map.map3d.entity.BRTPoint;
+import com.brtbeacon.map.map3d.route.BRTDirectionalHint;
 import com.brtbeacon.map.map3d.route.BRTMapRouteManager;
+import com.brtbeacon.map.map3d.route.BRTRoutePart;
 import com.brtbeacon.map.map3d.route.BRTRouteResult;
 import com.brtbeacon.map.map3d.route.GeometryEngine;
+import com.brtbeacon.map.map3d.utils.BRTConvert;
 import com.brtbeacon.map.map3d.utils.BRTSearchAdapter;
+import com.brtbeacon.mapdata.BRTLocalPoint;
+import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class NavMapActivity extends Activity implements View.OnClickListener, SensorEventListener , BRTMapView.BRTMapViewListener{
+public class NavMapActivity extends Activity implements View.OnClickListener, BRTMapView.BRTMapViewListener{
 
 
     private static final String TAG = NavMapActivity.class.getSimpleName();
 
     BRTMapView mapView;
     BRTMapRouteManager routeManager = null;
+    BRTPoint startPoint,endPoint=null;
     BRTSearchAdapter searchAdapter;
     List<BRTPoiEntity> entityList=new ArrayList<>();
     IpalmapSearchAdapter mAdapter;
-
+    private BRTLocationManager locationManager;
+    private int pointIndex = 0;
     //模拟导航定时更新
     Handler mockHandler = new Handler();
 
@@ -86,7 +99,6 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
     TextView tv_start;
     TextView tv_end;
     TextView tv_floor;
-    boolean hasNavRoad;//在该状态下，有规划路线的话，back第一次按时取消路线，第二次按时隐藏起始末尾组件
 
     //顶部 导航正在行进中的起始末尾组件
     LinearLayout ll_naving_container;
@@ -120,20 +132,13 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
     String endName;//终点名字
 
     Bundle mData;
-    Timer timer;
     TimerTask timerTask;
 
     boolean isMoniNaving;
     boolean isFirstArrived;//用来做导航结束后的回调标志
     boolean isRestartNaving;//当偏离导航时 ，重新请求导航路线
 
-    private Marker startMarker,endMarker;
-//    SimpleImageMarker startMarker, endMarker;
-//    Position locationPosition;
-
-//    List<Feature> featureList;
-
-
+    BRTPoint locationPosition;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -144,51 +149,8 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.ipalmap_header_bar);
         mData = getIntent().getBundleExtra("map_info");
         initMapView(savedInstanceState);
-        initPositioning();
         initView();
-        initSensor();
-    }
-
-    private void initSensor() {
-
-        SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_FASTEST);
-    }
-
-    private void initPositioning() {
-
-//        PalmapPositioning.get().init(this);
-//        PalmapPositioningOptions options = new PalmapPositioningOptions();
-//
-//        options.setPort(Integer.valueOf(mData.getString("port")));
-//        PalmapPositioning.get().addOpitions(options);
-//        PalmapPositioning.get().startBlePosition();
-//        timerTask = new TimerTask() {
-//            @Override
-//            public void run() {
-//                if (isMoniNaving) {
-//                    return;
-//                }
-//                final Position position = PalmapPositioning.get().getResult();
-//                if (position.getX() <= 0) {
-//                    return;
-//                }
-//                locationPosition = position;
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        if (isMoniNaving) {
-//                            return;
-//                        }
-//                        if (mapView.checkInitCompleted()) {
-//                            palmap.updateLocation(position.getFloorId(), false, position.getX(), position.getY());
-//                        }
-//                    }
-//                });
-//            }
-//        };
-//        timer = new Timer();
-//        timer.scheduleAtFixedRate(timerTask, 0, 500);
+        checkBluetooth();
     }
 
     private void initView() {
@@ -215,8 +177,8 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
         ll_nav_button_container = (LinearLayout) findViewById(R.id.ipalmap_nav_nav_button_container);
         btn_nav_moni = (Button) findViewById(R.id.ipalmap_nav_btn_moni);
         btn_nav_start = (Button) findViewById(R.id.ipalmap_nav_btn_start);
-//        v_zoom_out = findViewById(R.id.ipalmap_zoom_out);
-//        v_zoom_in = findViewById(R.id.ipalmap_zoom_in);
+        v_zoom_out = findViewById(R.id.ipalmap_zoom_out);
+        v_zoom_in = findViewById(R.id.ipalmap_zoom_in);
         ib_naving = (ImageButton) findViewById(R.id.ipalmap_nav_ib_naving);
         ib_naving.setOnClickListener(this);
         ll_naving_container = (LinearLayout) findViewById(R.id.ipalmap_nav_naving_container);
@@ -253,9 +215,9 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
         lv_search.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Feature feature = featureList.get(position);
-//                startName = feature.getDisplay();
-//                markStartLocation(new Coordinate(feature.getCenter().x, feature.getCenter().y));
+                BRTPoiEntity entity = entityList.get(position);
+                markStartLocation(new BRTPoint(entity.getFloorNumber(),entity.getLatLng().getLatitude(),entity.getLatLng().getLongitude()),"定位点");
+
             }
         });
 
@@ -268,8 +230,8 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
         btn_nav_moni.setOnClickListener(this);
         btn_nav_start.setOnClickListener(this);
 
-//        v_zoom_out.setOnClickListener(this);
-//        v_zoom_in.setOnClickListener(this);
+        v_zoom_out.setOnClickListener(this);
+        v_zoom_in.setOnClickListener(this);
         ib_naving.setOnClickListener(this);
     }
 
@@ -285,138 +247,18 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.addMapListener(this);
-        mapView.setHighLightColor(Color.BLUE);
+
         mapView.init(mData.getString("mapid"), mData.getString("appkey"), BRTMapView.MAP_LOAD_MODE_OFFLINE);
-        searchAdapter = new BRTSearchAdapter(mapView.getBuilding().getBuildingID());
-
-//        palmap.setOnRouteRequestListener(new OnRouteRequestListener() {
-//            @Override
-//            public void onRequestSucceed() {
-//                pb_Bar.setVisibility(View.GONE);
-//                hasNavRoad = true;
-//                if(isRestartNaving){
-//                    isRestartNaving=false;
-//                    //偏离只出现在实际导航上
-//                    palmap.getNavigateManager().start(false, 1, 1000);
-//                }
-//            }
-//
-//            @Override
-//            public void onRequestFailed(NavigateException e) {
-//                Toast.makeText(NavMapActivity.this, e.toString(), Toast.LENGTH_LONG).show();
-//                hasNavRoad = false;
-//            }
-//        });
-//
-//
-//        palmap.getNavigateManager().addNavigateUpdateListener(new OnNavigateUpdateListener() {
-//            @Override
-//            public void onNavigateUpdate(NaviInfo naviInfo) {
-//                //此处可以获取导航回调信息
-//                if (naviInfo != null) {
-//                    tv_naving_middle.setText(naviInfo.getNaviTip());
-//
-//                    if(true){
-//                        if(naviInfo.getDistance()>5){
-//
-//                            palmap.getNavigateManager().stop();
-//                            //清除导航线
-//                            palmap.clearNavigateRoute();
-//                            //清除导航数据
-//                            palmap.getNavigateManager().clear();
-//
-//                            isRestartNaving=true ;
-//
-//                            Coordinate coord=new Coordinate(locationPosition.getX(), locationPosition.getY());
-//                            if (startMarker == null) {
-//                                startMarker = new SimpleImageMarker(NavMapActivity.this, coord, mapView.getCurrentFloorId());
-//                                startMarker.setImageResource(R.drawable.ipalmap_start);
-//                                mapView.addOverlay(startMarker);
-//                            } else {
-//                                startMarker.coordinate(new Coordinate(coord.x, coord.y));
-//                                mapView.refreshOverlay();
-//                            }
-//                            pb_Bar.setVisibility(View.VISIBLE);
-//                            palmap.requestRoute(
-//                                    startMarker.getGeoCoordinate().x, startMarker.getGeoCoordinate().y, startMarker.getFloorId(),
-//                                    endMarker.getGeoCoordinate().x, endMarker.getGeoCoordinate().y, endMarker.getFloorId());
-//                        }
-//                    }
-//                    else if (naviInfo.getNextAction() == ActionState.ACTION_ARRIVE && naviInfo.getTotalRemainLength() < 0.3 && !isFirstArrived) {
-//                        isFirstArrived = true;
-//                        Toast.makeText(NavMapActivity.this, "您已到达目的地", Toast.LENGTH_LONG).show();
-//                        if (!isMoniNaving) {
-//                            tv_naving_middle.postOnAnimationDelayed(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    finish();
-//                                }
-//                            }, 2000);
-//                        }
-//                        stopNaving();
-//                    }
-//                }
-//
-//
-//            }
-//
-//            @Override
-//            public void onMockPosition(NodeInfo nodeInfo) {
-//                //此处可以获取模拟定位数据，不需要传入给NavigateManager
-//            }
-//
-//            @Override
-//            public void onPauseNavi() {
-//                Toast.makeText(NavMapActivity.this, "导航暂停", Toast.LENGTH_LONG).show();
-//            }
-//
-//            @Override
-//            public void onResumeNavi() {
-//                Toast.makeText(NavMapActivity.this, "导航恢复", Toast.LENGTH_LONG).show();
-//            }
-//
-//
-//        });
+        searchAdapter = new BRTSearchAdapter(mData.getString("mapid"));
     }
 
-    private void renderMark() {
 
-
-//        Coordinate coord = new Coordinate(mData.getDouble("map_x_value"), mData.getDouble("map_y_value"));
-//        endMarker = new SimpleImageMarker(NavMapActivity.this, coord, mapView.getCurrentFloorId());
-//        endMarker.setImageResource(R.drawable.ipalmap_end);
-//        mapView.addOverlay(endMarker);
-//
-//        List<Feature> features = mapView.searchFeaturesByWorldCoordinate(coord);
-//        if (features == null || features.isEmpty()) {
-//            Toast.makeText(this, "当前层没有找到符合条件的POI", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//        mapView.resetAllRendererColor();
-//        //修改目标Poi背景颜色
-//        mapView.updateRendererColor(features.get(0).getId(), Color.BLUE);
-//
-//        endName = features.get(0).getDisplay();
-    }
-
-    private void markStartLocation(BRTPoi point) {
-
-        mapView.highlightPoi(point);
-        LatLng latLng = new LatLng(point.getPoint().getLatitude(), point.getPoint().getLongitude());
-        mapView.setRouteStart(point.getPoint());
-
-
-////        //清除导航线
-//        palmap.clearNavigateRoute();
-//        //清除导航数据
-//        palmap.getNavigateManager().clear();
-//
-//        pb_Bar.setVisibility(View.VISIBLE);
-//        palmap.requestRoute(
-//                startMarker.getGeoCoordinate().x, startMarker.getGeoCoordinate().y, startMarker.getFloorId(),
-//                endMarker.getGeoCoordinate().x, endMarker.getGeoCoordinate().y, endMarker.getFloorId());
-//        showStartEndView();
-
+    private void markStartLocation(BRTPoint point,String name) {
+        startPoint=point;
+        startName=name;
+        mapView.setRouteStart(point);
+        routeManager.requestRoute(startPoint, endPoint);
+        showStartEndView();
     }
 
 
@@ -439,12 +281,8 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
     protected void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
-        timer.cancel();
-//        PalmapPositioning.get().stopBlePositioning();
-//        PalmapPositioning.get().release();
-
-        SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        sm.unregisterListener(this);
+        mockHandler.removeCallbacksAndMessages(null);
+        locationManager.stopUpdateLocation();
     }
 
     @Override
@@ -572,48 +410,45 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
         } else if (id == R.id.ipalmap_nav_ll_floorup_container) {
             showSearchResultView();
         }
-//        else if (id == R.id.ipalmap_zoom_out) {
-//            //地图放大
-//            mapView.zoomIn();
-//        } else if (id == R.id.ipalmap_zoom_in) {
-//            //地图缩小
-//            mapView.zoomOut();
-//        }
+        else if (id == R.id.ipalmap_zoom_out) {
+            //地图放大
+            mapView.setZoomIn();
+        } else if (id == R.id.ipalmap_zoom_in) {
+            //地图缩小
+            mapView.setZoomOut();
+        }
         else if (id == R.id.ipalmap_nav_ib_naving) {
-//            if (locationPosition != null) {
-//                markStartLocation(new Coordinate(locationPosition.getX(), locationPosition.getY()));
-//                startName = "定位点";
-//            } else {
-//                Toast.makeText(NavMapActivity.this, "获取定位点失败", Toast.LENGTH_SHORT).show();
-//            }
+            checkBluetooth();
+            if (locationPosition != null) {
+                markStartLocation(locationPosition,"定位点");
+            } else {
+                Toast.makeText(NavMapActivity.this, "获取定位点失败", Toast.LENGTH_SHORT).show();
+            }
         } else if (id == R.id.ipalmap_nav_btn_moni) {
-//            if(!hasNavRoad){
-//                return;
-//            }
-//            isMoniNaving = true;
-//            isFirstArrived = false;
-//            palmap.postOnAnimationDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    palmap.getNavigateManager().start(true, 1, 1000);
-//                    showNavingView();
-//                }
-//            }, 500);
-
+            if (mapView.getRouteResult() == null)
+                return;
+            locationManager.stopUpdateLocation();
+            showNavingView();
+            isFirstArrived = false;
+            isMoniNaving = true;
+            BRTRoutePart part = mapView.getRouteResult().getAllRouteParts().get(0);
+            Point firstPoint = part.getFirstPoint();
+            BRTPoint point = new BRTPoint(part.getMapInfo().getFloorNumber(), firstPoint.latitude(), firstPoint.longitude());
+            handleNavLocation(point);
         } else if (id == R.id.ipalmap_nav_btn_start) {
-//            if(!hasNavRoad){
-//                return;
-//            }
-//            if (locationPosition != null) {
-//                isFirstArrived = false;
-//                palmap.getNavigateManager().start(false, 1, 1000);
-//                showNavingView();
-//            } else {
-//                Toast.makeText(NavMapActivity.this, "获取定位点失败", Toast.LENGTH_SHORT).show();
-//            }
-
+            if (mapView.getRouteResult() == null)
+                return;
+            checkBluetooth();
+            if(locationPosition==null){
+                Toast.makeText(NavMapActivity.this, "获取定位点失败", Toast.LENGTH_SHORT).show();
+            }else{
+                isMoniNaving = false;
+                isFirstArrived = false;
+                showNavingView();
+                handleNavLocation(locationPosition);
+            }
         } else if (id == R.id.ipalmap_nav_address_choose_back) {
-            if (hasNavRoad) {
+            if (mapView.getRouteResult()!=null) {
                 stopNaving();
             } else {
                 showInitView();
@@ -624,38 +459,15 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
     }
 
     private void stopNaving() {
-
-//        palmap.getNavigateManager().stop();
-//        //清除导航线
-//        palmap.clearNavigateRoute();
-//        //清除导航数据
-//        palmap.getNavigateManager().clear();
-//
-//        hasNavRoad = false;
-//        isMoniNaving = false;
-//        if (startMarker != null) {
-//            startMarker.coordinate(new Coordinate(0, 0));
-//            mapView.refreshOverlay();
-//        }
-//
-//        showInitView();
+        startPoint=null;
+        mapView.setLocation(null);
+        mapView.setRouteStart(null);
+        mapView.setRouteResult(null);
+        pointIndex=0;
+        isMoniNaving = false;
+        showInitView();
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (!mapLoaded) {
-            return;
-        }
-        if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
-//            float value = event.values[0];
-//            palmap.updatemAzimuth(value - (float) mapView.getRotate()+180);
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
 
     @Override
     public void mapViewDidLoad(BRTMapView brtMapView, Error error) {
@@ -666,12 +478,28 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
         mapView.setFloor(mapView.getFloorList().get(0));
         routeManager = new BRTMapRouteManager(mapView.getBuilding(), mapView.getFloorList());
         routeManager.addRouteManagerListener(routeManagerListener);
+
+        locationManager = new BRTLocationManager(this, mData.getString("mapid"), mData.getString("appkey"));
+        locationManager.addLocationEngineListener(locationManagerListener);
+        locationManager.setLimitBeaconNumber(true);
+        locationManager.setMaxBeaconNumberForProcessing(5);
+        locationManager.setRssiThreshold(-75);
+        locationManager.startUpdateLocation();
     }
 
     @Override
     public void onFinishLoadingFloor(BRTMapView brtMapView, BRTFloorInfo brtFloorInfo) {
         mapLoaded = true;
-        mapView.setRouteEnd(new BRTPoint(brtFloorInfo.getFloorNumber(),mData.getDouble("map_x_value"),mData.getDouble("map_y_value")));
+        endPoint=new BRTPoint(brtFloorInfo.getFloorNumber(),mData.getDouble("map_x_value"),mData.getDouble("map_y_value"));
+        mapView.setRouteEnd(endPoint);
+
+        CompassView compassView = mapView.getCompassView();
+        FrameLayout.LayoutParams layoutParams=new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.topMargin=300;
+        layoutParams.leftMargin=20;
+        compassView.setLayoutParams(layoutParams);
+
+
     }
 
     @Override
@@ -696,7 +524,7 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                markStartLocation(points.get(0));
+                                markStartLocation(points.get(0).getPoint(),points.get(0).getName());
                             }
                         });
                     }
@@ -722,31 +550,13 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
                 @Override
                 public void run() {
                     Toast.makeText(NavMapActivity.this, "Load map failure : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    mapView.setRouteResult(null);
                 }
             });
         }
     };
 
-    private void animateUpdateGraphic(final double offset, final BRTPoint lp1, final BRTPoint lp2) {
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (isFinishing())
-//                    return;
-//                double distance = GeometryEngine.distance(lp1.getPoint(), lp2.getPoint());
-//                if (distance > 0 && offset<distance) {
-//                    Point tmp = getPointWithLengthAndOffset(lp1, lp2, offset / distance);
-//                    //mapView.centerAt(tmp,false);
-//                    showCurrentHint(new BRTPoint(lp1.getFloorNumber(), tmp.latitude(), tmp.longitude()));
-//                    animateUpdateGraphic(offset + 10.0, lp1, lp2);
-//                }else {
-//                    showCurrentHint(lp2);
-//                    showHints(lp2);
-//                }
-//
-//            }
-//        }, 250);
-    }
+
 
     private Point getPointWithLengthAndOffset(BRTPoint start, BRTPoint end, double per) {
         double scale = per;
@@ -755,5 +565,158 @@ public class NavMapActivity extends Activity implements View.OnClickListener, Se
         double y = start.getLongitude() * (1 - scale) + end.getLongitude() * scale;
 
         return Point.fromLngLat(y, x);
+    }
+
+    private void checkBluetooth() {
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        if (adapter == null) {
+            Toast.makeText(NavMapActivity.this,"当前设备没有蓝牙，无法进行定位操作！",Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!adapter.isEnabled()) {
+            adapter.enable();
+        }
+
+    }
+
+
+    private BRTLocationManager.BRTLocationManagerListener locationManagerListener = new BRTLocationManager.BRTLocationManagerListener() {
+
+        @Override
+        public void didRangedBeacons(BRTLocationManager BRTLocationManager, List<BRTBeacon> list) {
+            System.out.println("didRangedBeacons");
+        }
+
+        @Override
+        public void didRangedLocationBeacons(BRTLocationManager BRTLocationManager, List<BRTPublicBeacon> list) {
+            System.out.println("didRangedLocationBeacons");
+        }
+
+        @Override
+        public void didFailUpdateLocation(BRTLocationManager BRTLocationManager, final Error error) {
+            System.out.println("didFailUpdateLocation");
+        }
+
+        @Override
+        public void didUpdateDeviceHeading(BRTLocationManager BRTLocationManager, double v) {
+            System.out.println("didUpdateDeviceHeading");
+            mapView.processDeviceRotation(v);
+        }
+
+        @Override
+        public void didUpdateImmediateLocation(BRTLocationManager BRTLocationManager, final BRTLocalPoint tyLocalPoint) {
+            System.out.println("didUpdateImmediateLocation");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    LatLng pointLL = BRTConvert.toLatLng(tyLocalPoint.getX(), tyLocalPoint.getY());
+                    locationPosition = new BRTPoint(tyLocalPoint.getFloor(), pointLL.getLatitude(), pointLL.getLongitude());
+                    handleNavLocation(locationPosition);
+                }
+            });
+        }
+
+        @Override
+        public void didUpdateLocation(BRTLocationManager BRTLocationManager, BRTLocalPoint tyLocalPoint) {
+            System.out.println("didUpdateLocation");
+        }
+    };
+
+
+    private void handleNavLocation(final BRTPoint point){
+        //新建、更新指示图标位置
+        mapView.setLocation(point);
+        if (mapView.getCurrentFloor().getFloorNumber() != point.getFloorNumber()) {
+            mapView.setFloorByNumber(point.getFloorNumber());
+        }
+
+        //以下是导航时处理的函数
+        BRTRouteResult brtRouteResult=mapView.getRouteResult();
+        if(brtRouteResult!=null){
+
+            //判断是否到终点
+            if (mapView.getRouteResult().distanceToRouteEnd(point) < 0.5) {
+                Toast.makeText(NavMapActivity.this, "您已到达目的地", Toast.LENGTH_LONG).show();
+                if (!isMoniNaving) {
+                    tv_naving_middle.postOnAnimationDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            finish();
+                        }
+                    }, 2000);
+                }else {
+
+                    locationManager.startUpdateLocation();
+                }
+                stopNaving();
+                return;
+            }
+
+            BRTRoutePart part = brtRouteResult.getNearestRoutePart(point);
+            if (part != null) {
+                List<BRTDirectionalHint> hints = part.getRouteDirectionalHint();
+                BRTDirectionalHint hint = part.getDirectionalHintForLocationFromHints(point, hints);
+                if (hint != null) {
+                    tv_naving_middle.setText(hint.getLandmarkString());
+                }
+            }
+
+        }
+
+
+        //以下代码仅用于模拟整条线路点位移动，实际场景可直接使用定位回调
+        //取出本段路线上各个点
+        if(isMoniNaving){
+            BRTRoutePart part = brtRouteResult.getNearestRoutePart(point);
+            if (part == null) {
+                return;
+            }
+            LineString line = part.getRoute();
+            Point pt = line.coordinates().get(pointIndex);
+            pointIndex++;
+            int floor = part.getMapInfo().getFloorNumber();
+            //是否为本段结束点
+            if (pt.equals(part.getLastPoint())) {
+                pointIndex = 0;
+                //是否为终段
+                if (!part.isLastPart()) {
+                    //取下一段路线起点
+                    BRTRoutePart nextPart = part.getNextPart();
+                    pt = nextPart.getFirstPoint();
+                    floor = nextPart.getMapInfo().getFloorNumber();
+                    if (floor != mapView.getCurrentFloor().getFloorNumber()) {
+                        mapView.setFloor(nextPart.getMapInfo());
+                    }
+                }
+            }
+            final BRTPoint localPoint = new BRTPoint(floor, pt.latitude(), pt.longitude());
+            animateUpdateGraphic(0, point, localPoint);
+        }
+    }
+
+    private void animateUpdateGraphic(final double offset, final BRTPoint lp1, final BRTPoint lp2) {
+        mockHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isFinishing())
+                    return;
+                double distance = GeometryEngine.distance(lp1.getPoint(), lp2.getPoint());
+                if (distance > 0 && offset<distance) {
+                    Point tmp = getPointWithLengthAndOffset(lp1, lp2, offset / distance);
+                    //mapView.centerAt(tmp,false);
+                    animateUpdateGraphic(offset + 10.0, lp1, lp2);
+                }else {
+                    if(mapView.getRouteResult()!=null){
+                        handleNavLocation(lp2);
+                    }
+                }
+
+            }
+        }, 250);
+    }
+
+    static {
+        System.loadLibrary("BRTLocationEngine");
     }
 }

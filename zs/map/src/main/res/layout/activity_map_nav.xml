@@ -16,7 +16,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="gone">
         <ImageView
             android:id="@+id/ipalmap_nav_iv_compass"
             android:layout_width="wrap_content"
@@ -56,7 +57,36 @@
                         android:background="@drawable/ipalmap_position"/>
                 </FrameLayout>
 
+                <FrameLayout
+                    android:layout_width="34dp"
+                    android:layout_height="64dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    >
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/map_btn_zoom"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        >
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:id="@+id/ipalmap_zoom_out"/>
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:id="@+id/ipalmap_zoom_in"/>
+                    </LinearLayout>
+                </FrameLayout>
+
             </RelativeLayout>
+
 
             <FrameLayout
                 android:id="@+id/ipalmap_nav_bottom_container"

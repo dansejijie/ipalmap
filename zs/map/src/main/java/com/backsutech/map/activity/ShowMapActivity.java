@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +33,12 @@ import com.brtbeacon.map.map3d.BRTMapEnvironment;
 import com.brtbeacon.map.map3d.BRTMapView;
 import com.brtbeacon.map.map3d.entity.BRTFloorInfo;
 import com.brtbeacon.map.map3d.entity.BRTPoi;
+import com.brtbeacon.map.map3d.entity.BRTPoiEntity;
 import com.brtbeacon.map.map3d.entity.BRTPoint;
+import com.brtbeacon.map.map3d.utils.BRTConvert;
+import com.brtbeacon.map.map3d.utils.BRTSearchAdapter;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+
 import org.json.JSONObject;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -65,6 +71,7 @@ public class ShowMapActivity extends Activity implements View.OnClickListener , 
 
     Bundle mData;
     BRTMapView mapView;
+    BRTSearchAdapter searchAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -124,9 +131,9 @@ public class ShowMapActivity extends Activity implements View.OnClickListener , 
             finish();
         } else if (id == R.id.ipalmap_header_bar_nav) {
             if (bookLoaded) {
-//                Intent intent = new Intent(ShowMapActivity.this, NavMapActivity.class);
-//                intent.putExtra("map_info", mData);
-//                startActivity(intent);
+                Intent intent = new Intent(ShowMapActivity.this, NavMapActivity.class);
+                intent.putExtra("map_info", mData);
+                startActivity(intent);
             }
         } else if (id == R.id.ipalmap_ib_help) {
             popupHelpView();
@@ -211,17 +218,23 @@ public class ShowMapActivity extends Activity implements View.OnClickListener , 
 
         String call_number = "";
         String book_name = "";
+        String org_id="";
+        String location="";
+        String group="";
 
         Intent intent = getIntent();
         try {
             call_number = intent.getStringExtra("call_number");
             book_name = intent.getStringExtra("book_name");
+            org_id = intent.getStringExtra("org_id");
+            location = intent.getStringExtra("location");
+            group = intent.getStringExtra("group");
         } catch (Exception e) {
             Toast.makeText(this, "请确认是否传入正确参数call_number和book_name", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String url = Constants.SERVER_BACK_URL + Constants.BOOK_URL + "?call_number=" + call_number + "&book_name=" + book_name + "&LAB_JSON=1";
+        String url = Constants.SERVER_BACK_URL + Constants.BOOK_URL + "?call_number=" + call_number + "&book_name=" + book_name + "&org_id=" + org_id +"&location=" + location + "&group=" + group + "&LAB_JSON=1";
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(url)
@@ -255,10 +268,10 @@ public class ShowMapActivity extends Activity implements View.OnClickListener , 
             JSONObject bookshelf = data.getJSONObject("bookshelf");
             JSONObject room = data.getJSONObject("room");
             JSONObject index = data.getJSONObject("index");
-//            mData.putString("appkey", room.getString("appkey"));
-//            mData.putString("mapid", room.getString("mapid"));
-            mData.putString("appkey", "d4a6d090d3b04542bcf91e80f933c8e1");
-            mData.putString("mapid", "00230029");
+            mData.putString("appkey", room.getString("appkey"));
+            mData.putString("mapid", room.getString("mapid"));
+//            mData.putString("appkey", "d4a6d090d3b04542bcf91e80f933c8e1");
+//            mData.putString("mapid", "00230029");
 
             mData.putString("port", room.getString("port"));
             mData.putString("address", room.getString("library_title") + " " + room.getString("floor") + " " + room.getString("name"));
@@ -270,11 +283,11 @@ public class ShowMapActivity extends Activity implements View.OnClickListener , 
             mData.putInt("bookShelfColumns", Integer.parseInt(bookshelf.getString("specifications_column_count")));
             mData.putInt("bookRow", Integer.parseInt(index.getString("row")));
             mData.putInt("bookColumn", Integer.parseInt(index.getString("column")));
-//            mData.putDouble("map_x_value", Double.parseDouble(bookshelf.getString("map_x_value")));
-//            mData.putDouble("map_y_value", Double.parseDouble(bookshelf.getString("map_y_value")));
+            mData.putDouble("map_x_value", Double.parseDouble(bookshelf.getString("map_x_value")));
+            mData.putDouble("map_y_value", Double.parseDouble(bookshelf.getString("map_y_value")));
 
-            mData.putDouble("map_x_value", 29.40148499159531);
-            mData.putDouble("map_y_value", 106.56094207132105);
+//            mData.putDouble("map_x_value", 29.401475984752352);
+//            mData.putDouble("map_y_value", 106.56109829922548);
             bookLoaded = true;
 
             runOnUiThread(new Runnable() {
@@ -301,6 +314,7 @@ public class ShowMapActivity extends Activity implements View.OnClickListener , 
     private void initMapReady(){
         //地图SDK初始化
         mapView.init(mData.getString("mapid"), mData.getString("appkey"), BRTMapView.MAP_LOAD_MODE_OFFLINE);
+        searchAdapter = new BRTSearchAdapter(mData.getString("mapid"));
     }
 
 
@@ -378,7 +392,7 @@ public class ShowMapActivity extends Activity implements View.OnClickListener , 
     }
 
     @Override
-    public void onFinishLoadingFloor(BRTMapView brtMapView, BRTFloorInfo brtFloorInfo) {
+    public void onFinishLoadingFloor(BRTMapView brtMapView, final BRTFloorInfo brtFloorInfo) {
         brtMapView.postOnAnimationDelayed(new Runnable() {
             @Override
             public void run() {
@@ -388,22 +402,17 @@ public class ShowMapActivity extends Activity implements View.OnClickListener , 
                 tv_bookshelf_guide.setText(mData.getString("bookshelfGuide"));
                 ll_bubbleError.setVisibility(View.GONE);
 
-                BRTPoi poi =new BRTPoi();
-                poi.setBuildingID(mData.getString("mapid"));
-                poi.setPoint(new BRTPoint(1,mData.getDouble("map_x_value"),mData.getDouble("map_y_value")));
-                poi.setFloorNumber(1);
-                mapView.highlightPoi(poi);
-
-//                final List<Feature> features = mapView.searchFeaturesByWorldCoordinate(
-//                        new Coordinate(mData.getDouble("map_x_value"), mData.getDouble("map_y_value")));
-//                if (features == null || features.isEmpty()) {
-//                    Toast.makeText(ShowMapActivity.this, "当前层没有找到符合条件的POI", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-//
-//                mapView.resetAllRendererColor();
-//                //修改目标Poi背景颜色
-//                mapView.updateRendererColor(features.get(0).getId(), Color.BLUE);
+                List<BRTPoiEntity> lists = searchAdapter.queryPoiByRadius(new LatLng(mData.getDouble("map_x_value"),mData.getDouble("map_y_value")),4,brtFloorInfo.getFloorNumber());
+                if(lists!=null&&lists.size()>0) {
+                    BRTPoiEntity entity = lists.get(0);
+                    BRTPoi brtPoi = new BRTPoi();
+                    brtPoi.setFloorNumber(entity.getFloorNumber());
+                    brtPoi.setPoint(new BRTPoint(entity.getFloorNumber(),entity.getLatLng().getLatitude(),entity.getLatLng().getLongitude()));
+                    brtPoi.setBuildingID(mapView.getBuilding().getBuildingID());
+                    brtPoi.setLayer(entity.getLayer());
+                    brtPoi.setPoiID(entity.getPoiId());
+                    mapView.highlightPoi(brtPoi);
+                }
             }
         },2500);
     }
@@ -415,7 +424,7 @@ public class ShowMapActivity extends Activity implements View.OnClickListener , 
 
     @Override
     public void onPoiSelected(BRTMapView brtMapView, List<BRTPoi> list) {
-
+        Log.d("TAG","xx");
     }
 
 
